@@ -1,0 +1,343 @@
+
+
+!Command: show running-config
+!Running configuration last done at: Tue Mar  7 14:59:31 2023
+!Time: Tue Mar  7 14:59:31 2023
+
+version 10.1(1) Bios:version  
+hostname LEAF-1
+vdc LEAF-1 id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 248 maximum 248
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
+
+cfs eth distribute
+nv overlay evpn
+feature ospf
+feature bgp
+feature pim
+feature fabric forwarding
+feature interface-vlan
+feature vn-segment-vlan-based
+feature lacp
+feature vpc
+feature nv overlay
+
+no password strength-check
+username admin password 5 $5$FCEGBE$0rglw8.1IjeIp58QAL1kxSz1vf2Z6BTvunypd28Y5L7  role network-admin
+ip domain-lookup
+copp profile strict
+snmp-server user admin network-admin auth md5 0x29e95d82aa61d036033a57d173a69b22 priv aes-128 0x29e95d82aa61d036033a57d173a69b22 localizedkey
+rmon event 1 log trap public description FATAL(1) owner PMON@FATAL
+rmon event 2 log trap public description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 log trap public description ERROR(3) owner PMON@ERROR
+rmon event 4 log trap public description WARNING(4) owner PMON@WARNING
+rmon event 5 log trap public description INFORMATION(5) owner PMON@INFO
+
+fabric forwarding anycast-gateway-mac 0000.dcdc.dcdc
+ip pim rp-address 111.111.111.111 group-list 225.0.0.0/16
+ip pim ssm range 232.0.0.0/8
+vlan 1,3,6,100,200,500,1000,3888-3889
+vlan 100
+  vn-segment 1111100
+vlan 200
+  name L3_VNI
+  vn-segment 1111200
+vlan 500
+  vn-segment 1111500
+
+no spanning-tree vlan 222,500
+route-map conntected permit 10
+  match tag 11111 
+vrf context BLUE
+  vni 1111200
+  ip pim ssm range 232.0.0.0/8
+  address-family ipv4 unicast
+    route-target both auto
+    route-target both auto evpn
+vrf context management
+hardware access-list tcam region racl 512
+hardware access-list tcam region arp-ether 256 double-wide
+system nve infra-vlans 3888
+vpc domain 333
+  peer-switch
+  role priority 1
+  peer-keepalive destination 4.4.4.4 source 3.3.3.3 vrf default
+  peer-gateway
+
+
+interface Vlan1
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan100
+  no shutdown
+  mtu 9000
+  vrf member BLUE
+  no ip redirects
+  ip address 201.168.1.1/24 tag 11111
+  no ipv6 redirects
+  ip pim sparse-mode
+  fabric forwarding mode anycast-gateway
+
+interface Vlan200
+  no shutdown
+  vrf member BLUE
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan500
+  no shutdown
+  mtu 9000
+  vrf member BLUE
+  no ip redirects
+  ip address 202.168.1.1/24 tag 11111
+  no ipv6 redirects
+  ip router ospf BLUE area 0.0.0.0
+  ip pim sparse-mode
+  fabric forwarding mode anycast-gateway
+
+interface Vlan3888
+  description For underlay OSPF on peer-link
+  no shutdown
+  mtu 9000
+  no ip redirects
+  ip address 195.168.1.1/24
+  no ipv6 redirects
+  ip ospf network point-to-point
+  ip router ospf 1 area 0.0.0.0
+  ip pim sparse-mode
+
+interface Vlan3889
+  no shutdown
+  vrf member BLUE
+  no ip redirects
+  ip address 196.168.1.1/24
+  no ipv6 redirects
+  ip ospf network point-to-point
+  ip router ospf BLUE area 0.0.0.0
+
+interface port-channel77
+  switchport access vlan 500
+
+interface port-channel88
+  switchport access vlan 100
+  vpc 88
+
+interface port-channel99
+  switchport mode trunk
+  vpc 99
+
+interface port-channel3333
+  description VPC peer link
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface nve1
+  no shutdown
+  host-reachability protocol bgp
+  source-interface loopback0
+  member vni 1111100
+    suppress-arp
+    mcast-group 239.0.0.1
+  member vni 1111200 associate-vrf
+  member vni 1111500
+    suppress-arp
+    mcast-group 239.0.0.2
+
+interface Ethernet1/1
+  no switchport
+  mtu 9000
+  ip address 192.168.1.1/30
+  ip ospf network point-to-point
+  ip router ospf 1 area 0.0.0.0
+  ip pim sparse-mode
+  no shutdown
+
+interface Ethernet1/2
+  switchport access vlan 500
+  channel-group 77 mode active
+
+interface Ethernet1/3
+
+interface Ethernet1/4
+
+interface Ethernet1/5
+  switchport access vlan 100
+  channel-group 88 mode active
+
+interface Ethernet1/6
+  switchport mode trunk
+  channel-group 3333 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface mgmt0
+  vrf member management
+
+interface loopback0
+  ip address 1.1.1.1/32
+  ip address 33.33.33.33/32 secondary
+  ip router ospf 1 area 0.0.0.0
+  ip pim sparse-mode
+
+interface loopback100
+  ip address 10.255.255.1/32
+
+interface loopback333
+  description VPC PEER-KEEP-ALIVE
+  ip address 3.3.3.3/32
+  ip router ospf 1 area 0.0.0.0
+icam monitor scale
+
+line console
+line vty
+router ospf 1
+router ospf BLUE
+  vrf BLUE
+    router-id 196.168.1.1
+router bgp 1
+  router-id 1.1.1.1
+  neighbor 11.11.11.11
+    remote-as 1
+    update-source loopback0
+    address-family l2vpn evpn
+      send-community extended
+  vrf BLUE
+    address-family ipv4 unicast
+      redistribute direct route-map conntected
+evpn
+  vni 1111100 l2
+    rd auto
+    route-target import auto
+    route-target export auto
+  vni 1111500 l2
+    rd auto
+    route-target import auto
+    route-target export auto
+
+
+!
+
+
+!end
