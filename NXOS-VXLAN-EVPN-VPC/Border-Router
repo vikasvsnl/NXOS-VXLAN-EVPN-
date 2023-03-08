@@ -1,0 +1,86 @@
+
+!
+! Last configuration change at 15:34:01 UTC Tue Mar 7 2023
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname BORDER_Router
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+ip cef
+!
+!
+!
+!
+!
+!
+no ipv6 cef
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 99.99.99.99 255.255.255.255
+ ip ospf network point-to-point
+!
+interface FastEthernet0/0
+ ip address 197.168.1.2 255.255.255.252
+ duplex full
+!
+router bgp 100
+ bgp log-neighbor-changes
+ neighbor 197.168.1.1 remote-as 1
+ !
+ address-family ipv4
+  network 99.99.99.99 mask 255.255.255.255
+  neighbor 197.168.1.1 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ login
+!
+!
+end
